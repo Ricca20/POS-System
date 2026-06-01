@@ -10,6 +10,8 @@ use App\Http\Controllers\Api\CategoryApiController;
 use App\Http\Controllers\Api\OpeningStockApiController;
 use App\Http\Controllers\Api\PosApiController;
 use App\Http\Controllers\Api\ProductApiController;
+use App\Http\Controllers\Api\SaleApiController;
+use App\Http\Controllers\Api\SellReturnApiController;
 use App\Http\Controllers\Api\StockAdjustmentApiController;
 use App\Http\Controllers\Api\StockTransferApiController;
 use App\Http\Controllers\Api\TaxRateApiController;
@@ -163,6 +165,38 @@ Route::prefix('v1')
                     ->name('api.v1.pos.recent-transactions');
                 Route::get('/pos/reward-details', [PosApiController::class, 'rewardDetails'])
                     ->name('api.v1.pos.reward-details');
+
+                // Sales management endpoints (task 5.5, R8.1, R8.2).
+                // CRITICAL ORDERING: `/sales/drafts` and
+                // `/sales/quotations` MUST be registered BEFORE
+                // `/sales/{id}` so Laravel's router matches the literal
+                // segments first. If the parameterized route were
+                // registered first, Laravel would treat the literal
+                // "drafts" / "quotations" path tokens as `{id}` values
+                // and bind them to `show()`, which would 404 on a
+                // string id rather than dispatching to the dedicated
+                // list endpoints.
+                Route::get('/sales/drafts', [SaleApiController::class, 'drafts'])
+                    ->name('api.v1.sales.drafts');
+                Route::get('/sales/quotations', [SaleApiController::class, 'quotations'])
+                    ->name('api.v1.sales.quotations');
+                Route::get('/sales', [SaleApiController::class, 'index'])
+                    ->name('api.v1.sales.index');
+                Route::get('/sales/{id}', [SaleApiController::class, 'show'])
+                    ->name('api.v1.sales.show')
+                    ->whereNumber('id');
+                Route::post('/sales/{id}/duplicate', [SaleApiController::class, 'duplicate'])
+                    ->name('api.v1.sales.duplicate')
+                    ->whereNumber('id');
+                Route::delete('/sales/{id}', [SaleApiController::class, 'destroy'])
+                    ->name('api.v1.sales.destroy')
+                    ->whereNumber('id');
+
+                // Sell-return endpoints (task 5.5, R8.1, R8.2).
+                Route::get('/sell-returns', [SellReturnApiController::class, 'index'])
+                    ->name('api.v1.sell-returns.index');
+                Route::post('/sell-returns', [SellReturnApiController::class, 'store'])
+                    ->name('api.v1.sell-returns.store');
             });
         });
 
