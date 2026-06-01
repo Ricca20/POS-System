@@ -1,0 +1,21 @@
+{
+  "name": "pos-desktop-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Top-level orchestration for the POS Desktop App (Option B). Coordinates the Electron shell, the Vue 3 SPA, and the bundled Laravel API.",
+  "workspaces": [
+    "electron",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace frontend",
+    "build:frontend": "npm run build --workspace frontend",
+    "build:electron": "npm run lint --workspace electron",
+    "dist": "npm run build:frontend && npm run build:electron",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  }
+}
