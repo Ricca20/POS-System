@@ -6,7 +6,59 @@
   "main": "main.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "start": "electron .",
+    "build:frontend": "cd ../frontend && npm run build",
+    "dist:mac": "npm run build:frontend && electron-builder --mac",
+    "dist:win": "npm run build:frontend && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.posdesktop.app",
+    "productName": "POS Desktop",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "server-manager.js",
+      "db-manager.js",
+      "printer-manager.js",
+      "../frontend/dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "../",
+        "to": "laravel",
+        "filter": [
+          "app/**/*",
+          "bootstrap/**/*",
+          "config/**/*",
+          "database/**/*",
+          "public/**/*",
+          "resources/**/*",
+          "routes/**/*",
+          "storage/**/*",
+          "artisan",
+          "composer.json",
+          "vendor/**/*",
+          "!node_modules",
+          "!electron",
+          "!frontend"
+        ]
+      },
+      {
+        "from": "../bin",
+        "to": "bin",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.business"
+    },
+    "win": {
+      "target": "nsis"
+    }
   },
   "engines": {
     "node": ">=18.17.0"

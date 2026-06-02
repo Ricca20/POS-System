@@ -50,6 +50,10 @@ Route::prefix('v1')
             ->name('api.v1.auth.login');
 
         // Protected auth endpoints (R10.3, R10.4).
+Route::get("/health", function () {
+    return response()->json(["status" => "ok"]);
+})->name("api.v1.health");
+
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('/auth/me', [ApiAuthController::class, 'me'])
                 ->name('api.v1.auth.me');
@@ -246,6 +250,36 @@ Route::prefix('v1')
                 Route::post('/cash-register/open', [CashRegisterApiController::class, 'open'])->name('api.v1.cash-register.open');
                 Route::post('/cash-register/close', [CashRegisterApiController::class, 'close'])->name('api.v1.cash-register.close');
                 Route::get('/cash-register/details', [CashRegisterApiController::class, 'details'])->name('api.v1.cash-register.details');
+
+                // --- Phase 7 routes ---
+
+                // Reports
+                Route::prefix('reports')->name('api.v1.reports.')->group(function () {
+                    Route::get('/profit-loss', [ReportApiController::class, 'profit_loss'])->name('profit-loss');
+                    Route::get('/purchase-sell', [ReportApiController::class, 'purchase_sell'])->name('purchase-sell');
+                    Route::get('/stock', [ReportApiController::class, 'stock_report'])->name('stock');
+                    Route::get('/stock-details', [ReportApiController::class, 'stock_details'])->name('stock-details');
+                    Route::get('/trending-products', [ReportApiController::class, 'trending_products'])->name('trending-products');
+                    Route::get('/tax', [ReportApiController::class, 'tax_report'])->name('tax');
+                    Route::get('/expense', [ReportApiController::class, 'expense_report'])->name('expense');
+                    Route::get('/register', [ReportApiController::class, 'register_report'])->name('register');
+                    Route::get('/sales-representative', [ReportApiController::class, 'sales_representative_report'])->name('sales-representative');
+                    Route::get('/stock-expiry', [ReportApiController::class, 'stock_expiry_report'])->name('stock-expiry');
+                    Route::get('/customer-supplier', [ReportApiController::class, 'customer_supplier'])->name('customer-supplier');
+                    Route::get('/activity-log', [ReportApiController::class, 'activity_log'])->name('activity-log');
+                });
+
+                // Accounting
+                Route::prefix('accounts')->name('api.v1.accounts.')->group(function () {
+                    Route::get('/', [AccountingApiController::class, 'index'])->name('index');
+                    Route::post('/', [AccountingApiController::class, 'store'])->name('store');
+                    Route::get('/cash-flow', [AccountingApiController::class, 'cash_flow'])->name('cash-flow');
+                    Route::post('/fund-transfer', [AccountingApiController::class, 'fund_transfer'])->name('fund-transfer');
+                    Route::post('/deposit', [AccountingApiController::class, 'deposit'])->name('deposit');
+                    Route::get('/{id}', [AccountingApiController::class, 'show'])->name('show');
+                    Route::put('/{id}', [AccountingApiController::class, 'update'])->name('update');
+                    Route::post('/{id}/close', [AccountingApiController::class, 'close'])->name('close');
+                });
             });
         });
 
