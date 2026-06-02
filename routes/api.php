@@ -17,6 +17,14 @@ use App\Http\Controllers\Api\StockTransferApiController;
 use App\Http\Controllers\Api\TaxRateApiController;
 use App\Http\Controllers\Api\UnitApiController;
 use App\Http\Controllers\Api\VariationTemplateApiController;
+use App\Http\Controllers\Api\PurchaseApiController;
+use App\Http\Controllers\Api\PurchaseOrderApiController;
+use App\Http\Controllers\Api\PurchaseReturnApiController;
+use App\Http\Controllers\Api\ContactApiController;
+use App\Http\Controllers\Api\PaymentApiController;
+use App\Http\Controllers\Api\ExpenseApiController;
+use App\Http\Controllers\Api\ExpenseCategoryApiController;
+use App\Http\Controllers\Api\CashRegisterApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -197,6 +205,47 @@ Route::prefix('v1')
                     ->name('api.v1.sell-returns.index');
                 Route::post('/sell-returns', [SellReturnApiController::class, 'store'])
                     ->name('api.v1.sell-returns.store');
+
+                // --- Phase 6 routes ---
+
+                // Purchases
+                Route::get('/purchases', [PurchaseApiController::class, 'index'])->name('api.v1.purchases.index');
+                Route::post('/purchases', [PurchaseApiController::class, 'store'])->name('api.v1.purchases.store');
+                Route::get('/purchases/{id}', [PurchaseApiController::class, 'show'])->name('api.v1.purchases.show')->whereNumber('id');
+                Route::put('/purchases/{id}', [PurchaseApiController::class, 'update'])->name('api.v1.purchases.update')->whereNumber('id');
+                Route::delete('/purchases/{id}', [PurchaseApiController::class, 'destroy'])->name('api.v1.purchases.destroy')->whereNumber('id');
+                Route::get('/purchase-orders', [PurchaseOrderApiController::class, 'index'])->name('api.v1.purchase-orders.index');
+                Route::post('/purchase-orders', [PurchaseOrderApiController::class, 'store'])->name('api.v1.purchase-orders.store');
+                Route::post('/purchase-returns', [PurchaseReturnApiController::class, 'store'])->name('api.v1.purchase-returns.store');
+
+                // Contacts (literal segments first)
+                Route::get('/contacts/customers', [ContactApiController::class, 'customers'])->name('api.v1.contacts.customers');
+                Route::get('/contacts', [ContactApiController::class, 'index'])->name('api.v1.contacts.index');
+                Route::post('/contacts', [ContactApiController::class, 'store'])->name('api.v1.contacts.store');
+                Route::get('/contacts/{id}', [ContactApiController::class, 'show'])->name('api.v1.contacts.show')->whereNumber('id');
+                Route::put('/contacts/{id}', [ContactApiController::class, 'update'])->name('api.v1.contacts.update')->whereNumber('id');
+                Route::delete('/contacts/{id}', [ContactApiController::class, 'destroy'])->name('api.v1.contacts.destroy')->whereNumber('id');
+                Route::get('/contacts/{id}/ledger', [ContactApiController::class, 'ledger'])->name('api.v1.contacts.ledger')->whereNumber('id');
+                Route::get('/contacts/{id}/payments', [ContactApiController::class, 'payments'])->name('api.v1.contacts.payments')->whereNumber('id');
+
+                // Payments
+                Route::get('/payments', [PaymentApiController::class, 'index'])->name('api.v1.payments.index');
+                Route::post('/payments', [PaymentApiController::class, 'store'])->name('api.v1.payments.store');
+                Route::get('/payments/{id}', [PaymentApiController::class, 'show'])->name('api.v1.payments.show')->whereNumber('id');
+                Route::post('/payments/pay-contact-due', [PaymentApiController::class, 'payContactDue'])->name('api.v1.payments.pay-contact-due');
+
+                // Expenses
+                Route::get('/expenses', [ExpenseApiController::class, 'index'])->name('api.v1.expenses.index');
+                Route::post('/expenses', [ExpenseApiController::class, 'store'])->name('api.v1.expenses.store');
+                Route::put('/expenses/{id}', [ExpenseApiController::class, 'update'])->name('api.v1.expenses.update')->whereNumber('id');
+                Route::delete('/expenses/{id}', [ExpenseApiController::class, 'destroy'])->name('api.v1.expenses.destroy')->whereNumber('id');
+                Route::get('/expense-categories', [ExpenseCategoryApiController::class, 'index'])->name('api.v1.expense-categories.index');
+
+                // Cash Register
+                Route::get('/cash-register/current', [CashRegisterApiController::class, 'current'])->name('api.v1.cash-register.current');
+                Route::post('/cash-register/open', [CashRegisterApiController::class, 'open'])->name('api.v1.cash-register.open');
+                Route::post('/cash-register/close', [CashRegisterApiController::class, 'close'])->name('api.v1.cash-register.close');
+                Route::get('/cash-register/details', [CashRegisterApiController::class, 'details'])->name('api.v1.cash-register.details');
             });
         });
 
