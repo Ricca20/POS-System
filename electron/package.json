@@ -10,7 +10,7 @@
     "start": "electron .",
     "build:frontend": "cd ../frontend && npm run build",
     "dist:mac": "npm run build:frontend && electron-builder --mac",
-    "dist:win": "npm run build:frontend && electron-builder --win"
+    "dist:win": "npm run build:frontend && electron-builder --win --x64"
   },
   "build": {
     "appId": "com.posdesktop.app",
@@ -69,14 +69,14 @@
     "node": ">=18.17.0"
   },
   "dependencies": {
-    "electron": "28.3.3",
-    "electron-builder": "24.13.3",
     "electron-updater": "6.8.6",
     "tweetnacl": "1.0.3",
     "winston": "3.19.0"
   },
   "devDependencies": {
     "@playwright/test": "1.60.0",
+    "electron": "28.3.3",
+    "electron-builder": "24.13.3",
     "eslint": "8.57.1",
     "fast-check": "4.8.0",
     "vitest": "4.1.7"

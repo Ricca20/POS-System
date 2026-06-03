@@ -1,3 +1,17 @@
 {
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "search.exclude": {
+        "**/node_modules": true,
+        "electron/dist": true,
+        "frontend/dist": true
+    },
+    "files.watcherExclude": {
+        "**/node_modules/*/**": true,
+        "electron/dist/**": true,
+        "frontend/dist/**": true
+    },
+    "intelephense.environment.exclude": [
+        "**/vendor/**",
+        "electron/dist/**"
+    ]
 }
