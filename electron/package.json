@@ -24,7 +24,11 @@
       "server-manager.js",
       "db-manager.js",
       "printer-manager.js",
-      "../frontend/dist/**/*"
+      {
+        "from": "../frontend/dist",
+        "to": "frontend-dist",
+        "filter": ["**/*"]
+      }
     ],
     "extraResources": [
       {
@@ -57,7 +61,8 @@
       "category": "public.app-category.business"
     },
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icon.ico"
     }
   },
   "engines": {

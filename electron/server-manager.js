@@ -1,6 +1,7 @@
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const { app } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const winston = require('winston');
 
 const logger = winston.createLogger({
@@ -28,8 +29,11 @@ class ServerManager {
       ? path.join(process.resourcesPath, 'laravel')
       : (options.laravelPath || path.join(__dirname, '..'));
 
+    const isWin = process.platform === 'win32';
+    const phpExecutable = isWin ? 'php.exe' : 'php';
+
     this.phpBinary = app.isPackaged
-      ? path.join(process.resourcesPath, 'bin', 'php', 'php') // Assuming a structure like bin/php/php
+      ? path.join(process.resourcesPath, 'bin', 'php', phpExecutable)
       : options.phpBinary || 'php'; // Fallback to system PHP in dev
   }
 
@@ -40,10 +44,52 @@ class ServerManager {
         return;
       }
 
+      // Check and scaffold .env if needed
+      const envPath = path.join(this.laravelPath, '.env');
+      const envExamplePath = path.join(this.laravelPath, '.env.example');
+      
+      if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
+        logger.info('.env file missing, creating from .env.example...');
+        fs.copyFileSync(envExamplePath, envPath);
+        try {
+          logger.info('Generating app key...');
+          execSync(`"${this.phpBinary}" artisan key:generate`, { cwd: this.laravelPath });
+        } catch (err) {
+          logger.error(`Failed to generate app key: ${err.message}`);
+        }
+      }
+
+      // Pre-create Laravel storage directories in UserData to avoid permission errors
+      const storagePath = path.join(app.getPath('userData'), 'laravel_storage');
+      const requiredDirs = [
+        'app/public',
+        'framework/cache/data',
+        'framework/sessions',
+        'framework/testing',
+        'framework/views',
+        'logs'
+      ];
+      
+      requiredDirs.forEach(dir => {
+        const fullPath = path.join(storagePath, dir);
+        if (!fs.existsSync(fullPath)) {
+          fs.mkdirSync(fullPath, { recursive: true });
+        }
+      });
+
       logger.info(`Starting PHP server on ${this.host}:${this.port}...`);
       
       this.phpProcess = spawn(this.phpBinary, ['artisan', 'serve', `--host=${this.host}`, `--port=${this.port}`], {
-        cwd: this.laravelPath
+        cwd: this.laravelPath,
+        env: {
+          ...process.env,
+          DB_HOST: '127.0.0.1',
+          DB_PORT: '3307',
+          DB_DATABASE: 'pos_system',
+          DB_USERNAME: 'root',
+          DB_PASSWORD: '',
+          LARAVEL_STORAGE_PATH: storagePath
+        }
       });
 
       this.phpProcess.stdout.on('data', (data) => {

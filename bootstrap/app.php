@@ -15,6 +15,9 @@ $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
+$app->useStoragePath(env('LARAVEL_STORAGE_PATH', base_path('storage')));
+
+
 /*
 |--------------------------------------------------------------------------
 | Bind Important Interfaces

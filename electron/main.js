@@ -45,18 +45,16 @@ async function createWindow() {
     show: false // Hide until ready
   });
 
-  // Check if we are running in dev mode or production
-  // For now, assume production and load from local PHP server
-  // The PHP server serves the Vue frontend if configured, or just the API
-  // In our case, the frontend might be running on a dev server (Vite: 5173) or built.
-  // We'll point it to the PHP server port which will serve the API and the built Vue app.
-  
-  // Actually, we'll just point it to the PHP server:
-  const serverUrl = `http://127.0.0.1:${serverManager.port}`;
-  
   try {
-    logger.info(`Loading UI from ${serverUrl}`);
-    await mainWindow.loadURL(serverUrl);
+    if (app.isPackaged) {
+      const indexPath = path.join(__dirname, 'frontend-dist', 'index.html');
+      logger.info(`Loading UI from file: ${indexPath}`);
+      await mainWindow.loadFile(indexPath);
+    } else {
+      const devServerUrl = 'http://127.0.0.1:5173';
+      logger.info(`Loading UI from dev server: ${devServerUrl}`);
+      await mainWindow.loadURL(devServerUrl);
+    }
     mainWindow.show();
   } catch (e) {
     logger.error(`Failed to load UI: ${e.message}`);
@@ -76,7 +74,7 @@ app.whenReady().then(async () => {
     await dbManager.waitForDatabase();
 
     // 2. Run Migrations (optional/first-run)
-    await dbManager.runMigrations(path.join(__dirname, '..'));
+    await dbManager.runMigrations(serverManager.laravelPath, serverManager.phpBinary);
 
     // 3. Start PHP Server
     await serverManager.start();
@@ -110,4 +108,5 @@ app.on('before-quit', () => {
 
 // --- IPC Handlers ---
 ipcMain.handle('get-app-version', () => app.getVersion());
+ipcMain.handle('get-api-url', () => `http://127.0.0.1:${serverManager.port}/api/v1`);
 

@@ -13,6 +13,7 @@ import vue from '@vitejs/plugin-vue';
  *   component tests can run without a real browser.
  */
 export default defineConfig({
+  base: './',
   plugins: [vue()],
   resolve: {
     alias: {

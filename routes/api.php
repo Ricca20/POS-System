@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\PaymentApiController;
 use App\Http\Controllers\Api\ExpenseApiController;
 use App\Http\Controllers\Api\ExpenseCategoryApiController;
 use App\Http\Controllers\Api\CashRegisterApiController;
+use App\Http\Controllers\Api\ReportApiController;
+use App\Http\Controllers\Api\AccountingApiController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,10 +52,6 @@ Route::prefix('v1')
             ->name('api.v1.auth.login');
 
         // Protected auth endpoints (R10.3, R10.4).
-Route::get("/health", function () {
-    return response()->json(["status" => "ok"]);
-})->name("api.v1.health");
-
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('/auth/me', [ApiAuthController::class, 'me'])
                 ->name('api.v1.auth.me');
